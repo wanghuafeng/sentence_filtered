@@ -12,3 +12,4 @@ fab_command = '''fab -H unicorn -- "cd /home/wanghuafeng/cloud_word/node-sri/tes
         mv ghost.packet.partial_* splited_data"'''    
 
 exec_fab文件将filtered_sentence.py拷贝到远程s3服务器中的指定目录，并在s3执行该文件，同时将标准输出显示在本地以便调试  
+test/unmatch_ngram_filter  
