@@ -35,7 +35,9 @@ def execute_on_s3():
 # execute_on_s3()
 def filtered_unmatch_sentence():
     s3_execute_python_path = '/home/ferrero/cloudinn/filtered_unmatch_sentence'
-    scp_command = "scp /home/huafeng/PycharmProjects/filtered_unmatch_sentence/filtered_sentence.py s3:%s"%s3_execute_python_path
+    current_path = '/home/huafeng/PycharmProjects/filtered_unmatch_sentence'
+    scp_command = "scp {current_path}/filtered_sentence.py {current_path}/filtered_sentence_unusual_streamline.py s3:{s3_execute_python_path}".format(current_path=current_path, s3_execute_python_path=s3_execute_python_path)
+    # print scp_command
     IsFailed = subprocess.call(scp_command, shell=True)
     if not IsFailed:
         command = 'python %s/filtered_sentence.py'%s3_execute_python_path
