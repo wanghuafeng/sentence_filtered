@@ -6,11 +6,20 @@
 
 ##fab [options] -- [shell command]  
 
+所有在 '--'之后的语句将会转化为run()来执行
+command = 'cd /home/wanghuafeng/cloud_word/node-sri/test/unmatch_ngram_filter; ls'
+os.system('fab -H unicorn -- "%s"'%command)#在unicorn上执行command语句（注意，此处双引号不能缺少）
+os.system('fab -H "unicorn, s2, s3, ana" -- "uname -a"')#在远程服务器unicorn, s2, s3, ana上执行 uname -a 语句
+设置host的方式：
+	* Per-task, command-line host lists (fab mytask:host=host1) override absolutely everything else.
+	* Per-task, decorator-specified host lists (@hosts('host1')) override the env variables.
+	* Globally specified host lists set in the fabfile (env.hosts = ['host1']) can override such lists set on the command-line, but only if you’re not careful (or want them to.)
+	* Globally specified host lists set on the command-line (--hosts=host1) will initialize the envvariables, but that’s it.
+
 fab_command = '''fab -H unicorn -- "cd /home/wanghuafeng/cloud_word/node-sri/test/unmatch_ngram_filter;   
         python split_file.py -f ghost.packet -c 10;   
         mkdir splited_data;   
         mv ghost.packet.partial_* splited_data"'''    
-
 exec_fab文件将filtered_sentence.py拷贝到远程s3服务器中的指定目录，并在s3执行该文件，同时将标准输出显示在本地以便调试  
 
 ###关于阻塞与非阻塞子进程使用：  
@@ -19,5 +28,6 @@ exec_fab文件将filtered_sentence.py拷贝到远程s3服务器中的指定目�
 （2）当父进程与子进程有数据交互（进程通讯），或者子进程crash时要求父进程同样中断，此时比较适合阻塞式    
 &nbsp;&nbsp;阻塞式:subprocess.call(command, shell=True)    
 而实际上:subprocess.call(*popenargs, **kwargs) 即为 subprocess.Popen(*popenargs, **kwargs).wait()进行了已成封装    
+
 
 另：stdout.read()的数据总是为ASCII（没有彻底测试，待考证）    
