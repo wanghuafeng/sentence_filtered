@@ -105,15 +105,35 @@ def exec_script_on_s3():
         else:
             print "USAGE -i sentence_filename"
             raise ValueError("USAGE -i sentence_filename")
-def sentence2Packet_test():
-    '''由sentence文件转换为packet文件，在s3上执行'''
-    local_path = '/home/huafeng/PycharmProjects/filtered_unmatch_sentence/sentence2Packet.py'
+def sentence2Packet_execute(sentence_filename, sentence_file_to_move = False, py_update = False):
+    '''由sentence文件转换为packet文件，在s3上执行
+        sentence文件放到制定路径下: {remote_path}/prebuild_packet
+        param:
+            sentence_filename:文件的相对地址
+            py_update:是否修改了python源文件
+            sentence_file_to_move:是否有sentence文件需要移动
+        return：
+            在s3服务器生成与sentence文件相对应的packet文件（同一个目录下，文件名：sentence_filename.packet）
+    '''
+    sentence_path = '/home/huafeng/PycharmProjects/filtered_unmatch_sentence'
     remote_path = '/home/ferrero/cloudinn/filtered_unmatch_sentence'
-    scp_command = 'scp {local_path} s3:{remote_path}'.format(local_path=local_path, remote_path=remote_path)
-    IsScpFailed = subprocess.call(scp_command, shell=True)
+    IsScpFailed = True
+    if py_update:#若过滤逻辑有改动，则此处将文件上传
+        local_path = '/home/huafeng/PycharmProjects/filtered_unmatch_sentence/sentence2Packet.py'
+        scp_command = 'scp {local_path} s3:{remote_path}'.format(local_path=local_path, remote_path=remote_path)
+        print 'scp exectuing ...'
+        IsScpFailed = subprocess.call(scp_command, shell=True)
+    if sentence_file_to_move:#若有sentence文件需要生成.packet文件，则此处scp到s3
+        # sentence_filename = "{sentence_path}/{sentence_filename}".format(sentence_path=sentence_path, sentence_filename=sentence_filename)
+        scp_command = 'scp {sentence_path}/{sentence_filename} s3:{remote_path}/prebuild_packet/'.format(sentence_filename=sentence_filename, remote_path=remote_path, sentence_path=sentence_path)
+        print scp_command
+        print 'scp sentence file execting...'
+        IsScpFailed = subprocess.call(scp_command, shell=True)
     if not IsScpFailed:
-        print '%s sucess ...'%scp_command
-        py_command = 'python {remote_path}/sentence2Packet.py -i {remote_path}/prebuild_packet/{sentence_filename}'.format(remote_path=remote_path, sentence_filename='2011_2013_words.txt')#sentence文件的绝对路径
-        fab_command = 'fab -H s3 -- "{py_command}"'.format(py_command=py_command)
+        py_command = 'python {remote_path}/sentence2Packet.py -i {remote_path}/prebuild_packet/{sentence_filename}'.format(remote_path=remote_path, sentence_filename=sentence_filename)#sentence文件的绝对路径
+        fab_command = 'fab -H s3 --keepalive=10 -- "{py_command}"'.format(py_command=py_command)
         subprocess.call(fab_command, shell=True)
-# sentence2Packet_test()
+if __name__ == "__main__":
+    pass
+    sentence_filename = 'filtered_total_song.txt'
+    sentence2Packet_execute(sentence_filename, True)
