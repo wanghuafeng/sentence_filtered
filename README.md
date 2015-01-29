@@ -17,9 +17,9 @@ os.system('fab -H "unicorn, s2, s3, ana" -- "uname -a"')#在远程服务器unico
 	* Globally specified host lists set on the command-line (--hosts=host1) will initialize the envvariables, but that’s it.        
 
 fab_command = '''fab -H unicorn -- "cd /home/wanghuafeng/cloud_word/node-sri/test/unmatch_ngram_filter;   
-        python split_file.py -f ghost.packet -c 10;   
-        mkdir splited_data;   
-        mv ghost.packet.partial_* splited_data"'''    
+&nbsp;&nbsp;        python split_file.py -f ghost.packet -c 10;   
+&nbsp;&nbsp;        mkdir splited_data;   
+&nbsp;&nbsp;        mv ghost.packet.partial_* splited_data"'''    
 exec_fab文件将filtered_sentence.py拷贝到远程s3服务器中的指定目录，并在s3执行该文件，同时将标准输出显示在本地以便调试     
 
 ###关于阻塞与非阻塞子进程使用：  
