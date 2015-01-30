@@ -30,4 +30,4 @@ exec_fab文件将filtered_sentence.py拷贝到远程s3服务器中的指定目�
 而实际上:subprocess.call(*popenargs, **kwargs) 即为 subprocess.Popen(*popenargs, **kwargs).wait()进行了已成封装    
 
 
-另：stdout.read()的数据总是为ASCII（没有彻底测试，待考证）    
+另：stdout.read()的数据总是为ASCII（使用popen.stdout.readlines()时可逐行进行decode('utf-8')）    
