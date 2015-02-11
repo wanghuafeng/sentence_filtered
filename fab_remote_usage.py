@@ -17,8 +17,7 @@ def tar_():
 def split_file_on_unicorn():
     #on unicorn 将文件切割为n分
     scp_command = "scp split_file.py {hostname}:{desPath}".format(hostname = 'unicorn',desPath='/home/wanghuafeng/cloud_word/node-sri/test/unmatch_ngram_filter')
-    errInfo = open("err.log")#错误信息写入err.log
-    IsFailed = subprocess.call(scp_command, shell=True, stderr=errInfo)
+    IsFailed = subprocess.call(scp_command, shell=True)
     if not IsFailed:
         fab_command = '''fab -H unicorn -- "cd /home/wanghuafeng/cloud_word/node-sri/test/unmatch_ngram_filter;
         python split_file.py -f ghost.packet -c 10;
@@ -115,7 +114,9 @@ def sentence2Packet_execute(sentence_filename, sentence_file_to_move = False, py
         return：
             在s3服务器生成与sentence文件相对应的packet文件（同一个目录下，文件名：sentence_filename.packet）
     '''
-    sentence_path = '/home/huafeng/PycharmProjects/filtered_unmatch_sentence'
+    sentence_path, sentence_filename = os.path.split(sentence_filename)
+    if not sentence_path:#若传值为相对路径，则设置sentence_path的默认路径
+        sentence_path = '/home/huafeng/PycharmProjects/filtered_unmatch_sentence'
     remote_path = '/home/ferrero/cloudinn/filtered_unmatch_sentence'
     IsScpFailed = True
     if py_update:#若过滤逻辑有改动，则此处将文件上传
@@ -129,11 +130,31 @@ def sentence2Packet_execute(sentence_filename, sentence_file_to_move = False, py
         print scp_command
         print 'scp sentence file execting...'
         IsScpFailed = subprocess.call(scp_command, shell=True)
-    if not IsScpFailed:
+
+    if (not sentence_file_to_move) or (not IsScpFailed):#如果没有向服务器端移动文件，则不用判断IsScpFailed参数
         py_command = 'python {remote_path}/sentence2Packet.py -i {remote_path}/prebuild_packet/{sentence_filename}'.format(remote_path=remote_path, sentence_filename=sentence_filename)#sentence文件的绝对路径
         fab_command = 'fab -H s3 --keepalive=10 -- "{py_command}"'.format(py_command=py_command)
         subprocess.call(fab_command, shell=True)
+
+def poi_packet_gen():
+    import json
+    remote_path = '/home/ferrero/cloudinn/filtered_unmatch_sentence'
+    scp_command = 'scp tmp_poi_dirlist.py s3:%s'%remote_path
+    subprocess.call(scp_command, shell=True)
+    fab_command = 'fab -H s3 -- "cd %s; python tmp_poi_dirlist.py"'%remote_path
+    popen = subprocess.Popen(fab_command, shell=True, stdout=subprocess.PIPE)
+    return_list = popen.stdout.readlines()
+    print len(return_list)
+    file_list = json.loads(return_list[2].strip().split(':')[-1])
+
+    # for sentence_filename in reversed(file_list):
+    #     print sentence_filename
+    #     sentence2Packet_execute(sentence_filename)
+
 if __name__ == "__main__":
-    pass
-    sentence_filename = 'filtered_total_song.txt'
-    sentence2Packet_execute(sentence_filename, True)
+    sentence_filename = 'ch_clean_dangdang_book.txt'
+    # sentence_filename = '/home/huafeng/PycharmProjects/spider/movie/filtered_vedio_name.txt'
+
+    sentence2Packet_execute(sentence_filename)
+
+    # poi_packet_gen()
