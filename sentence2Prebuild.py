@@ -33,7 +33,7 @@ def cloud_build(fd, stdin):
     for line in unmatched_sentence_unique_list:
         for chars in CHN_CHAR.findall(line):
             length = len(chars)
-            if length <= 1 or length >= 10 or cnltk.is_basic(chars):
+            if length <= 1 or length >= 15:# or cnltk.is_basic(chars):
                 continue
             word = {}
             word['w'] = chars
@@ -55,10 +55,6 @@ def cloud_build(fd, stdin):
                 print "Build %s failed!" % chars
 
 if __name__ == '__main__':
-    # from phonetic import cnltk
-    # s = u'犯罪嫌疑人'.encode('utf-8')
-    # pinyin = cnltk.cut_for_pinyin(s, HFO=True)
-    # print pinyin
 
     args = sys.argv[1:]
     if len(args) == 4:

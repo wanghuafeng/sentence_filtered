@@ -13,7 +13,7 @@ if __name__ == "__main__":
         sentence_filename = args[1]#sentence ==> *.prebuild
         assert os.path.isfile(sentence_filename), 'sentence_filename not exists...'
         prebuild_filename = sentence_filename.rsplit('.', 1)[0] + '.prebuild'
-        sentence2Prebuild = 'python {script_path}/sentence2Prebuild.py -s {sentence_file} -d {prebuild_file}'.format(script_path=script_path, sentence_file=sentence_filename, prebuild_file=prebuild_filename)#执行Sentence2Prebuild.py文件，参数为-s sentence_filename -d prebuild_filename，生成prebuild文件
+        sentence2Prebuild = 'python {script_path}/sentence2Prebuild_with_num_letter.py -s {sentence_file} -d {prebuild_file}'.format(script_path=script_path, sentence_file=sentence_filename, prebuild_file=prebuild_filename)#执行Sentence2Prebuild.py文件，参数为-s sentence_filename -d prebuild_filename，生成prebuild文件
         genPrebuildFailed = subprocess.call(sentence2Prebuild, shell=True)
         if not genPrebuildFailed:#*.prebuild ==> *.packet
             print 'sentence to *.prebuild sucessed ...'

@@ -104,7 +104,7 @@ def exec_script_on_s3():
         else:
             print "USAGE -i sentence_filename"
             raise ValueError("USAGE -i sentence_filename")
-def sentence2Packet_execute(sentence_filename, sentence_file_to_move = False, py_update = False):
+def sentence2Packet_execute(sentence_filename, with_num_letter=False, sentence_file_to_move=False, py_update=False):
     '''由sentence文件转换为packet文件，在s3上执行
         sentence文件放到制定路径下: {remote_path}/prebuild_packet
         param:
@@ -132,7 +132,10 @@ def sentence2Packet_execute(sentence_filename, sentence_file_to_move = False, py
         IsScpFailed = subprocess.call(scp_command, shell=True)
 
     if (not sentence_file_to_move) or (not IsScpFailed):#如果没有向服务器端移动文件，则不用判断IsScpFailed参数
-        py_command = 'python {remote_path}/sentence2Packet.py -i {remote_path}/prebuild_packet/{sentence_filename}'.format(remote_path=remote_path, sentence_filename=sentence_filename)#sentence文件的绝对路径
+        if not with_num_letter:#不支持数字和字母
+            py_command = 'python {remote_path}/sentence2Packet.py -i {remote_path}/prebuild_packet/{sentence_filename}'.format(remote_path=remote_path, sentence_filename=sentence_filename)#sentence文件的绝对路径
+        else:#支持数字和字母
+            py_command = 'python {remote_path}/sentence2Packet_with_num_letter.py -i {remote_path}/prebuild_packet/{sentence_filename}'.format(remote_path=remote_path, sentence_filename=sentence_filename)#sentence文件的绝对路径
         fab_command = 'fab -H s3 --keepalive=10 -- "{py_command}"'.format(py_command=py_command)
         subprocess.call(fab_command, shell=True)
 
@@ -152,9 +155,8 @@ def poi_packet_gen():
     #     sentence2Packet_execute(sentence_filename)
 
 if __name__ == "__main__":
-    sentence_filename = 'ch_clean_dangdang_book.txt'
+    sentence_filename = 'aaa.txt'
     # sentence_filename = '/home/huafeng/PycharmProjects/spider/movie/filtered_vedio_name.txt'
-
-    sentence2Packet_execute(sentence_filename)
+    sentence2Packet_execute(sentence_filename, with_num_letter=True)
 
     # poi_packet_gen()

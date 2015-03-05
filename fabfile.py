@@ -2,13 +2,12 @@ __author__ = 'huafeng'
 
 import os
 import time
-from fabric.api import * 
+from fabric.api import * #,run, env
 env.use_ssh_config = True
-
 def build_to_packet():
     env.keepalive = 10
     command = "python {0}/builds_to_packet.py -i {0}/unmatch.prebuild -o {0}/ghost.packet".format('/home/wanghuafeng/cloud_word/node-sri/test/unmatch_ngram_filter')
-    run(command)
+    # run(command)
 
 def test_cd():
     env.keepalive = 10
@@ -31,3 +30,4 @@ def multi_server():
 def local_test():
     command = "ls"
     local(command)
+# local_test()

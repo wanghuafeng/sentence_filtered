@@ -88,7 +88,7 @@ if __name__ == "__main__":
         if os.path.split(build_name)[-1] == "baidu_freq.build":
             os.system("mv /home/ferrero/cloudinn/data/{yesterday_format}/baidu_freq.build /home/ferrero/cloudinn/data/{yesterday_format}/{new_baidu_freq_name}".format(yesterday_format = yesterday_format, new_baidu_freq_name = ready_to_filter_fileanme))
             handle_unusual_stream_file = os.path.join(PATH, 'filtered_sentence_unusual_streamline.py')
-            subprocess.Popen("nohup python %s -f %s &"%(handle_unusual_stream_file, ready_to_filter_fileanme), shell=True)#耗时较久的操作，此处为非阻塞式子进程运行，不会影响常规数据流程
+            subprocess.Popen("nohup python %s -f %s &"%(handle_unusual_stream_file, ready_to_filter_fileanme), shell=True)
             continue
         os.system('cp %s %s'%(build_name, build_name+".bak"))#back ghost.prebuild file
         nfs = NgramFilterSentence(build_name)
