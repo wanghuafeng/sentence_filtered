@@ -13,7 +13,7 @@ import time
 import codecs
 
 CHN_CHAR = re.compile(ur"[\u4e00-\u9fa5]+")#汉字正则
-CHN_NUM_LETTER_PATTERN = re.compile(ur"[\u4e00-\u9fa5\w]+")
+CHN_NUM_LETTER_PATTERN = re.compile(ur"[\u4e00-\u9fa5\da-zA-Z]+")
 NUM_LETTER_PATTERN = re.compile(u"\w+")
 _curpath = os.path.normpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 MARKER_OBJ = phodecs.Phodecs()
@@ -29,10 +29,14 @@ def cloud_build(fd, stdin):
     unmatched_sentence_list = stdin.readlines()#unicode
     seen = set()
     unmatched_sentence_unique_list = (item for item in unmatched_sentence_list if item not in seen and not seen.add(item))
+    column_len = len(unmatched_sentence_list[1].split('\t'))
     for line in unmatched_sentence_unique_list:
-        for chars_num_letter in CHN_NUM_LETTER_PATTERN.findall(line):
+        splited_line = line.rstrip().split('\t')
+        char_line = splited_line[0]
+        freq = splited_line[-1] if column_len>1 else '0'
+        for chars_num_letter in CHN_NUM_LETTER_PATTERN.findall(char_line):
             length = len(chars_num_letter)
-            if length <= 1 or length >= 15:# or cnltk.is_basic(chars):
+            if length < 1 or length >= 15:
                 continue
 
             #处理字母或数字
@@ -77,13 +81,13 @@ def cloud_build(fd, stdin):
                     dpy_str = ''.join([''.join((item[0][1], item[1][1])) for item in zip(num_letter_info_list, char_info_list)])
                     adpy_str = ''.join([''.join((item[0][2], item[1][2])) for item in zip(num_letter_info_list, char_info_list)])
                 # print chars_num_letter, '==>', adpy_str, '==>', dpy_str
-                json_info_str = json.dumps({'_id':chars_num_letter, 'd':dpy_str,'a':adpy_str, 'f':0, 'uf':0})
+                json_info_str = json.dumps({'_id':chars_num_letter, 'd':dpy_str,'a':adpy_str, 'f':freq, 'uf':0})
             elif char_info_list:#只含有汉字
-                json_info_str = json.dumps({'_id':chars_num_letter, 'd':char_info_list[0][1],'a':char_info_list[0][2], 'f':0, 'uf':0})
+                json_info_str = json.dumps({'_id':chars_num_letter, 'd':char_info_list[0][1],'a':char_info_list[0][2], 'f':freq, 'uf':0})
                 # print chars_num_letter, char_info_list[0][1], char_info_list[0][2]
 
             else:#只包含字母或数字
-                json_info_str = json.dumps({'_id':chars_num_letter, 'd':num_letter_info_list[0][1],'a':num_letter_info_list[0][2], 'f':0, 'uf':0})
+                json_info_str = json.dumps({'_id':chars_num_letter, 'd':num_letter_info_list[0][1],'a':num_letter_info_list[0][2], 'f':freq, 'uf':0})
                 # print chars_num_letter, '==>', num_letter_info_list[0][1], '==>', num_letter_info_list[0][2]
             fd.write(json_info_str + '\n')
 
