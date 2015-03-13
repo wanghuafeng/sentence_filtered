@@ -1,3 +1,4 @@
+<pre>
 # sentence_filtered
 语言模型过滤不匹配句子，通过fabric进行远程控制
 
@@ -18,7 +19,8 @@ os.system('fab -H "unicorn, s2, s3, ana" -- "uname -a"')
 	* Per-task, decorator-specified host lists (@hosts('host1')) override the env variables.   
 	* Globally specified host lists set in the fabfile (env.hosts = ['host1']) can override
 	  such lists set on the command-line, but only if you’re not careful (or want them to.)    
-	* Globally specified host lists set on the command-line (--hosts=host1) will initialize the envvariables, but that’s it.        
+	* Globally specified host lists set on the command-line
+		(--hosts=host1) will initialize the envvariables, but that’s it.        
 
 fab_command = '''fab -H unicorn -- "cd /home/wanghuafeng/cloud_word/node-sri/test/unmatch_ngram_filter;
 python split_file.py -f ghost.packet -c 10;
@@ -44,3 +46,4 @@ exec_fab文件将filtered_sentence.py拷贝到远程s3服务器中的指定目�
 	即为 subprocess.Popen(*popenargs, **kwargs).wait()进行了已成封装    
 
 另：stdout.read()的数据总是为ASCII（使用popen.stdout.readlines()时可逐行进行decode('utf-8')）    
+</pre>
