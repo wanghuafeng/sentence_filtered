@@ -2,6 +2,27 @@
 sentence_filtered
 语言模型过滤不匹配句子，通过fabric进行远程控制
 
+sentence.txt（清洗后的原始数据）==>  *.prebuild ==> *.packet(*.packet文件直
+	接交由horde进行词频抓取)
+	（脚本路径：/home/ferrero/cloudinn/filtered_unmatch_sentence）
+	1、sentence.txt ==> *.packet（两个方法，1)只保留汉字，2)保留汉字+数字+字母+空格）
+	（USAGE: -i sentence_filename）
+		1、sentence2Packet.py	
+			标音中的分词逻辑:在非汉字部分进行切割，即不存在数字、字母、空格的情况
+		2、sentence2Packet_with_num_letter.py
+			标音中的分词逻辑:在非汉字/字母/数字/空格处进行切割
+				1.若line中只有"字母+数字"，则保留期间空格
+				2.若line中"汉字"，则将line中的空格置空
+	2、sentence.txt ==> *.prebuild
+		(USAGE: -s sentence_filename -d prebuild_filename)#sentence_filename为绝对路径，
+		若有多列(\t隔开)，则视最后一列为词频被写入到*.prebuild文件中。
+		1、sentence2Prebuild.py
+			标音中的分词逻辑:在非汉字部分进行切割，即不存在数字、字母、空格的情况
+		2、sentence2Prebuild_with_num_letter.py
+			标音中的分词逻辑:在非汉字/字母/数字/空格处进行切割
+				1.若line中只有"字母+数字"，则保留期间空格
+				2.若line中"汉字"，则将line中的空格置空		
+***********************************************************************************
 若需要使用fabric时通过subprocess中的call方法执行fab_command且不添加-f参数，
 	则需要在目录中添加fabfile.py文件，
 文件中可以设置env的一些参数，例如（env.use_ssh_config = True）   
